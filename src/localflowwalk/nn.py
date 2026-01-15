@@ -1,0 +1,63 @@
+r"""Autoencoder neural network for gap filling.
+
+This module implements the autoencoder from Appendix A.2 of Nibauer et al.
+(2022) for assigning $\gamma$ values to stream tracers that were skipped by
+phase-flow walk.
+
+The autoencoder consists of:
+1. **Interpolation Network** (Encoder): Maps $(x, v) \to (\gamma, p)$
+2. **Param-Net** (Decoder): Maps $\gamma \to x$
+
+Examples
+--------
+>>> import jax
+>>> import jax.numpy as jnp
+>>> import localflowwalk as lfw
+
+>>> pos = {"x": jnp.linspace(0, 5, 20), "y": jnp.zeros(20)}
+>>> vel = {"x": jnp.ones(20), "y": jnp.zeros(20)}
+>>> result = lfw.walk_local_flow(pos, vel, start_idx=0, lam=1.0)
+
+>>> keys = jax.random.split(jax.random.key(0), 2)
+>>> normalizer = lfw.nn.StandardScalerNormalizer(pos, vel)
+>>> ae = lfw.nn.PathAutoencoder.make(normalizer=normalizer, key=keys[0])
+>>> cfg = lfw.nn.TrainingConfig(n_epochs_phase2=100)
+>>> ae, *_ = lfw.nn.train_autoencoder(ae, result, config=cfg, key=keys[1])
+
+"""
+
+__all__: tuple[str, ...] = (
+    # Network components
+    "OrderingNet",
+    "TrackNet",
+    "PathAutoencoder",
+    # Training
+    "train_autoencoder",
+    "train_ordering_net",
+    "TrainingConfig",
+    "OrderingTrainingConfig",
+    # Loss functions
+    "encoder_loss",
+    # Results
+    "AutoencoderResult",
+    # Convenience functions
+    "fill_ordering_gaps",
+    # Normalizers
+    "AbstractNormalizer",
+    "StandardScalerNormalizer",
+)
+
+from ._src.autoencoder import (
+    AbstractNormalizer,
+    AutoencoderResult,
+    OrderingNet,
+    OrderingTrainingConfig,
+    PathAutoencoder,
+    StandardScalerNormalizer,
+    TrackNet,
+    TrainingConfig,
+    encoder_loss,
+    fill_ordering_gaps,
+    train_autoencoder,
+    train_ordering_net,
+)
