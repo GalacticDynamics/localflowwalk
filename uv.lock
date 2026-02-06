@@ -1496,6 +1496,7 @@ nox = [
 test = [
     { name = "beartype" },
     { name = "hypothesis", extra = ["numpy"] },
+    { name = "jaxkd" },
     { name = "pytest" },
     { name = "pytest-arraydiff" },
     { name = "pytest-benchmark" },
@@ -1596,6 +1597,7 @@ nox = [
 test = [
     { name = "beartype", specifier = ">=0.21.0" },
     { name = "hypothesis", extras = ["numpy"], specifier = ">=6.138.14" },
+    { name = "jaxkd", specifier = ">=0.0.5" },
     { name = "pytest", specifier = ">=9.0.2" },
     { name = "pytest-arraydiff", specifier = ">=0.6.1" },
     { name = "pytest-benchmark", specifier = ">=5.1.0" },

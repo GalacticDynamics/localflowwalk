@@ -95,7 +95,8 @@ test = [
   "pytest-randomly>=3.16.0",
   "pytest-timeout>=2.3.1",
   "sybil[pytest]>=8.0.0",
-  "unxt>=1.10.0",                                   # Optional dependency, but included in test group for interop testing
+  "unxt>=1.10.0",
+  "jaxkd>=0.0.5",
 ]
 
 
