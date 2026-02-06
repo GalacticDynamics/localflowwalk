@@ -31,9 +31,12 @@ __all__: tuple[str, ...] = (
     "OrderingNet",
     "TrackNet",
     "PathAutoencoder",
+    "EncoderYouDecoder",
+    "RunningMeanDecoder",
     # Training
     "train_autoencoder",
     "train_ordering_net",
+    "train_simple_autoencoder",
     "TrainingConfig",
     "OrderingTrainingConfig",
     # Loss functions
@@ -50,9 +53,11 @@ __all__: tuple[str, ...] = (
 from ._src.autoencoder import (
     AbstractNormalizer,
     AutoencoderResult,
+    EncoderYouDecoder,
     OrderingNet,
     OrderingTrainingConfig,
     PathAutoencoder,
+    RunningMeanDecoder,
     StandardScalerNormalizer,
     TrackNet,
     TrainingConfig,
@@ -60,4 +65,5 @@ from ._src.autoencoder import (
     fill_ordering_gaps,
     train_autoencoder,
     train_ordering_net,
+    train_simple_autoencoder,
 )

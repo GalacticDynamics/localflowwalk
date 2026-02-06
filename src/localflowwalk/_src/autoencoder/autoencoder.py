@@ -698,13 +698,6 @@ def train_autoencoder_phase2(
 # ===================================================================
 
 
-class OptimizerStateDict(TypedDict):
-    """Return dict for Optimizer State."""
-
-    phase1: optax.OptState
-    phase2: optax.OptState
-
-
 @plum.dispatch
 def train_autoencoder(
     model: PathAutoencoder,
@@ -714,7 +707,9 @@ def train_autoencoder(
     *,
     config: TrainingConfig | None = None,
     key: PRNGKeyArray,
-) -> tuple[PathAutoencoder, OptimizerStateDict, Float[Array, " {config.n_epochs}"]]:
+) -> tuple[
+    PathAutoencoder, dict[str, optax.OptState], Float[Array, " {config.n_epochs}"]
+]:
     r"""Train the PathAutoencoder in two phases.
 
     This function orchestrates the complete two-phase training procedure:

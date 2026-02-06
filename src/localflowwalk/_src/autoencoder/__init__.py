@@ -60,6 +60,10 @@ __all__: tuple[str, ...] = (
     "PathAutoencoder",
     "train_autoencoder",
     "TrainingConfig",
+    # Encoder-You-Decoder
+    "EncoderYouDecoder",
+    "RunningMeanDecoder",
+    "train_simple_autoencoder",
     # Encoder
     "OrderingNet",
     "train_ordering_net",
@@ -90,6 +94,11 @@ from .order_net import (
     train_ordering_net,
 )
 from .track_net import TrackNet, TrackTrainingConfig, decoder_loss
+from .youdecoder import (
+    EncoderYouDecoder,
+    RunningMeanDecoder,
+    train_simple_autoencoder,
+)
 from localflowwalk._src.algorithm import LocalFlowWalkResult
 from localflowwalk._src.custom_types import FSzN, ISzN, VectorComponents
 
