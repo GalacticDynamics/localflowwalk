@@ -34,13 +34,13 @@ bibliography: paper.bib
 
 # Summary
 
-Stellar streams are elongated coherent structures of stars stripped from a
-progenitor (e.g. dwarf galaxy or globular cluster). As sensitive probes of
-galactic structure and dark matter distribution, streams have become essential
-tools in near-field cosmology [@Bonaca+PriceWhelan:2025:Review]. A common
-preprocessing step in stream analysis, be it of simulations or observations, is
-ordering the discrete observations of stream member stars and inferring the mean
-path of the stream's trajectory through phase-space.
+Filamentary structures are ubiquitous in the physical sciences, ranging from
+coherent streams of stars called stellar streams to elongated structures in
+turbulent fluids, plasmas, and the interstellar medium. In the context of
+stellar streams, a common preprocessing step in stream analysis, be it of
+simulations or observations, is ordering the discrete observations of stream
+member stars and inferring the mean path of the stream's trajectory through
+phase-space.
 
 `localflowwalk` is an open-source Python package for constructing such orderings
 and paths by _walking along the local phase-space flow_ using JAX
@@ -52,8 +52,8 @@ ordering and trajectory.
 `walk_local_flow` is very modular and can be customized to use any:
 
 1. **distance metric** that scores candidate next steps in phase space, and
-2. **query strategy**, like brute-force or kernel-density trees, that proposes
-   which candidates to consider.
+2. **query strategy**, like brute-force or KD-trees, that proposes which
+   candidates to consider.
 
 This design makes the Nearest Neighbors with Momentum (NN+p) method from
 [@nibauer2022charting] one particular configuration (via
@@ -62,11 +62,13 @@ alternative metrics and search strategies better matched to different data
 scenarios and performance constraints.
 
 In addition to the walk itself, `localflowwalk` packages a neural-network
-gap-filling component which assigns a continuous ordering parameter to tracers
-skipped during the walk and reconstructs the spatial mean path of the stream.
-This encoder develops upon the one in [@nibauer2022charting], speeding up
-different components of training by between 1 and 3 orders of magnitude and
-adding further stabilization of the loss function across training phases.
+gap-filling component which assigns a continuous ordering parameter to data
+skipped during the walk and reconstructs the spatial mean path of the structure.
+This encoder develops upon the one in [@nibauer2022charting]: speeding up
+different components of training by between 1 and 3 orders of magnitude; adding
+an intermediate decoder-only training that quarters the epochs necessary for
+training the full autoencoder, halving the overall training time; and adding
+stabilization of the loss function across training phases.
 
 # Statement of Need
 
@@ -119,7 +121,7 @@ walkresult = lfw.walk_local_flow(pos, vel, ...)
 normalizer = lfw.nn.StandardScalerNormalizer(pos, vel)
 ae = lfw.nn.PathAutoencoder.make(normalizer, key=jax.random.key(0))
 ae, *_ = lfw.nn.train_autoencoder(ae, walkresult, key=jax.random.key(1))
-result = lfw.nn.fill_ordering_gaps(trained, walkresult)
+result = lfw.nn.fill_ordering_gaps(ae, walkresult)
 ```
 
 # Performance Characteristics
@@ -130,11 +132,15 @@ multiple streams or parameter sweeps without code modification.
 
 - `walk_local_flow` runs in under a second.
 - Training the gap-filling path-ordering encoder takes under a second.
-- Training the path-inferring decoder takes a little under 30 seconds.
+- Training the decoder to reconstruct a running mean takes under 4 seconds.
+- Training the encoder and full path-inferring decoder takes a little under 16
+  seconds.
 
 The slowest step is the path-inferring decoder. Due to `localflowwalk`'s modular
-design this step is easily skipped and users can use the gap-filling encoder for
-custom path-inferring functions, e.g. a path-ordered rolling mean.
+design this step is easily skipped and users can use the gap-filling encoder
+with alternate or custom path-inferring functions. An included alternate
+function is a path-ordered rolling mean, which consumes a small fraction of a
+second after training the encoder.
 
 # Research Applications
 
