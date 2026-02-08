@@ -132,7 +132,7 @@ def trained_autoencoder(simple_2d_stream, rng_key):
     normalizer = lfw.nn.StandardScalerNormalizer(result.positions, result.velocities)
     ae = lfw.nn.PathAutoencoder.make(normalizer, key=rng_key)
 
-    config = lfw.nn.TrainingConfig(n_epochs_phase1=5, n_epochs_phase2=5)
+    config = lfw.nn.TrainingConfig(n_epochs_encoder=5, n_epochs_both=5, show_pbar=False)
     trained, _, _ = lfw.nn.train_autoencoder(ae, result, config=config, key=rng_key)
 
     return trained, result

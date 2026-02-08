@@ -1,4 +1,4 @@
-"""Tests for EncoderYouDecoder with running-mean decoder."""
+"""Tests for EncoderExternalDecoder with running-mean decoder."""
 
 import jax
 import jax.numpy as jnp
@@ -6,18 +6,10 @@ import jax.random as jr
 import pytest
 
 import localflowwalk as lfw
-from localflowwalk._src.autoencoder import (
-    EncoderYouDecoder,
-    OrderingNet,
-    OrderingTrainingConfig,
-    RunningMeanDecoder,
-    StandardScalerNormalizer,
-    train_simple_autoencoder,
-)
 
 
-class TestEncoderYouDecoder:
-    """Tests for EncoderYouDecoder class."""
+class TestEncoderExternalDecoder:
+    """Tests for EncoderExternalDecoder class."""
 
     @pytest.fixture
     def sample_data(self):
@@ -40,14 +32,14 @@ class TestEncoderYouDecoder:
     @pytest.fixture
     def normalizer(self, sample_data):
         """Create normalizer from sample data."""
-        return StandardScalerNormalizer(
+        return lfw.nn.StandardScalerNormalizer(
             sample_data["positions"], sample_data["velocities"]
         )
 
     @pytest.fixture
     def encoder(self, normalizer):
         """Create an OrderingNet encoder."""
-        return OrderingNet(
+        return lfw.nn.OrderingNet(
             in_size=2 * normalizer.n_spatial_dims,
             width_size=32,
             depth=2,
@@ -57,7 +49,7 @@ class TestEncoderYouDecoder:
     @pytest.fixture
     def decoder(self, encoder, normalizer, sample_data):
         """Create a running-mean decoder."""
-        return RunningMeanDecoder.make(
+        return lfw.nn.RunningMeanDecoder.make(
             encoder,
             normalizer,
             sample_data["positions"],
@@ -66,19 +58,19 @@ class TestEncoderYouDecoder:
         )
 
     def test_encoder_you_decoder_creation(self, encoder, decoder, normalizer):
-        """Test creating an EncoderYouDecoder instance."""
-        model = EncoderYouDecoder(
+        """Test creating an EncoderExternalDecoder instance."""
+        model = lfw.nn.EncoderExternalDecoder(
             encoder=encoder, decoder=decoder, normalizer=normalizer
         )
 
         assert model is not None
-        assert isinstance(model.encoder, OrderingNet)
+        assert isinstance(model.encoder, lfw.nn.OrderingNet)
         assert callable(model.decoder)
-        assert isinstance(model.normalizer, StandardScalerNormalizer)
+        assert isinstance(model.normalizer, lfw.nn.StandardScalerNormalizer)
 
     def test_encode_method(self, encoder, decoder, normalizer, sample_data):
-        """Test the encode method of EncoderYouDecoder."""
-        model = EncoderYouDecoder(
+        """Test the encode method of EncoderExternalDecoder."""
+        model = lfw.nn.EncoderExternalDecoder(
             encoder=encoder, decoder=decoder, normalizer=normalizer
         )
 
@@ -93,20 +85,21 @@ class TestEncoderYouDecoder:
         assert jnp.all((prob >= 0) & (prob <= 1))
 
     def test_decode_method(self, encoder, decoder, normalizer):
-        """Test the decode method of EncoderYouDecoder."""
-        model = EncoderYouDecoder(
+        """Test the decode method of EncoderExternalDecoder."""
+        model = lfw.nn.EncoderExternalDecoder(
             encoder=encoder, decoder=decoder, normalizer=normalizer
         )
 
         # Test multiple gamma values - use vmap for batched decoding
         gamma = jnp.array([0.0, 0.5, -0.5])
-        positions = jax.vmap(model.decode)(gamma)
+        qs = jax.vmap(model.decode)(gamma)
 
-        assert positions.shape == (3, 2)
+        assert len(qs) == 2
+        assert qs["x"].shape == (3,)
 
     def test_encode_decode_roundtrip(self, encoder, decoder, normalizer, sample_data):
         """Test encoding and decoding maintains reasonable reconstruction."""
-        model = EncoderYouDecoder(
+        model = lfw.nn.EncoderExternalDecoder(
             encoder=encoder, decoder=decoder, normalizer=normalizer
         )
 
@@ -121,7 +114,9 @@ class TestEncoderYouDecoder:
 
         # Should have same shape as normalized positions
         qs_norm, _ = normalizer.transform(positions, velocities)
-        assert reconstructed.shape == qs_norm.shape
+        # reconstructed is a dict with shape (N,) for each component
+        assert reconstructed["x"].shape == (sample_data["N"],)
+        assert reconstructed["y"].shape == (sample_data["N"],)
 
 
 class TestRunningMeanDecoder:
@@ -138,18 +133,18 @@ class TestRunningMeanDecoder:
     @pytest.fixture
     def encoder(self):
         """Create a simple encoder."""
-        return OrderingNet(in_size=4, width_size=32, depth=2, key=jr.key(0))
+        return lfw.nn.OrderingNet(in_size=4, width_size=32, depth=2, key=jr.key(0))
 
     @pytest.fixture
     def normalizer(self, sample_data):
         """Create normalizer."""
-        return StandardScalerNormalizer(
+        return lfw.nn.StandardScalerNormalizer(
             sample_data["positions"], sample_data["velocities"]
         )
 
     def test_decoder_creation(self, encoder, normalizer, sample_data):
         """Test creating a running-mean decoder."""
-        decoder = RunningMeanDecoder.make(
+        decoder = lfw.nn.RunningMeanDecoder.make(
             encoder,
             normalizer,
             sample_data["positions"],
@@ -161,7 +156,7 @@ class TestRunningMeanDecoder:
 
     def test_decoder_output_shape(self, encoder, normalizer, sample_data):
         """Test decoder output has correct shape."""
-        decoder = RunningMeanDecoder.make(
+        decoder = lfw.nn.RunningMeanDecoder.make(
             encoder,
             normalizer,
             sample_data["positions"],
@@ -177,7 +172,7 @@ class TestRunningMeanDecoder:
 
     def test_decoder_vectorization(self, encoder, normalizer, sample_data):
         """Test decoder works with vmap."""
-        decoder = RunningMeanDecoder.make(
+        decoder = lfw.nn.RunningMeanDecoder.make(
             encoder,
             normalizer,
             sample_data["positions"],
@@ -193,7 +188,7 @@ class TestRunningMeanDecoder:
 
     def test_decoder_jit_compatible(self, encoder, normalizer, sample_data):
         """Test decoder is JIT-compatible."""
-        decoder = RunningMeanDecoder.make(
+        decoder = lfw.nn.RunningMeanDecoder.make(
             encoder,
             normalizer,
             sample_data["positions"],
@@ -217,7 +212,7 @@ class TestRunningMeanDecoder:
         )
 
         # Create decoder with normalized arrays
-        decoder = RunningMeanDecoder.make(
+        decoder = lfw.nn.RunningMeanDecoder.make(
             encoder,
             normalizer,
             qs_norm,
@@ -233,7 +228,7 @@ class TestRunningMeanDecoder:
     def test_decoder_window_size_effect(self, encoder, normalizer, sample_data):
         """Test that window size affects decoder smoothness."""
         # Create decoders with different window sizes
-        decoder_small = RunningMeanDecoder.make(
+        decoder_small = lfw.nn.RunningMeanDecoder.make(
             encoder,
             normalizer,
             sample_data["positions"],
@@ -241,7 +236,7 @@ class TestRunningMeanDecoder:
             window_size=0.05,
         )
 
-        decoder_large = RunningMeanDecoder.make(
+        decoder_large = lfw.nn.RunningMeanDecoder.make(
             encoder,
             normalizer,
             sample_data["positions"],
@@ -259,8 +254,8 @@ class TestRunningMeanDecoder:
         assert result_large.shape == (2,)
 
 
-class TestTrainEncoderYouDecoder:
-    """Tests for train_simple_autoencoder function."""
+class TestTrainEncoderExternalDecoder:
+    """Tests for train_autoencoder function."""
 
     @pytest.fixture
     def sample_data(self):
@@ -273,18 +268,15 @@ class TestTrainEncoderYouDecoder:
 
     @pytest.fixture
     def model(self, sample_data):
-        """Create untrained EncoderYouDecoder."""
-        normalizer = StandardScalerNormalizer(
+        """Create untrained EncoderExternalDecoder."""
+        normalizer = lfw.nn.StandardScalerNormalizer(
             sample_data["positions"], sample_data["velocities"]
         )
-        encoder = OrderingNet(in_size=4, width_size=32, depth=2, key=jr.key(0))
-        decoder = RunningMeanDecoder.make(
-            encoder,
-            normalizer,
-            sample_data["positions"],
-            sample_data["velocities"],
+        encoder = lfw.nn.OrderingNet(in_size=4, width_size=32, depth=2, key=jr.key(0))
+        decoder = lfw.nn.RunningMeanDecoder.make(
+            encoder, normalizer, sample_data["positions"], sample_data["velocities"]
         )
-        return EncoderYouDecoder(
+        return lfw.nn.EncoderExternalDecoder(
             encoder=encoder, decoder=decoder, normalizer=normalizer
         )
 
@@ -294,15 +286,17 @@ class TestTrainEncoderYouDecoder:
         qs_norm, ps_norm = model.normalizer.transform(
             sample_data["positions"], sample_data["velocities"]
         )
-        ws_norm = jnp.concatenate([qs_norm, ps_norm], axis=1)
+        ws_norm = jnp.concat([qs_norm, ps_norm], axis=1)
 
-        config = OrderingTrainingConfig(n_epochs=5, batch_size=16, show_pbar=False)
+        config = lfw.nn.OrderingTrainingConfig(
+            n_epochs=5, batch_size=16, show_pbar=False
+        )
 
-        trained_model, opt_state, losses = train_simple_autoencoder(
+        trained_model, opt_state, losses = lfw.nn.train_autoencoder(
             model, ws_norm, sample_data["ordering"], config=config, key=jr.key(1)
         )
 
-        assert isinstance(trained_model, EncoderYouDecoder)
+        assert isinstance(trained_model, lfw.nn.EncoderExternalDecoder)
         assert losses.shape == (5,)
         assert jnp.all(jnp.isfinite(losses))
 
@@ -315,52 +309,38 @@ class TestTrainEncoderYouDecoder:
         walk_result = lfw.walk_local_flow(positions, velocities, start_idx=0, lam=1.0)
 
         # Create model
-        normalizer = StandardScalerNormalizer(positions, velocities)
-        encoder = OrderingNet(in_size=4, width_size=32, depth=2, key=jr.key(0))
-        decoder = RunningMeanDecoder.make(encoder, normalizer, positions, velocities)
-        model = EncoderYouDecoder(
+        normalizer = lfw.nn.StandardScalerNormalizer(positions, velocities)
+        encoder = lfw.nn.OrderingNet(in_size=4, width_size=32, depth=2, key=jr.key(0))
+        decoder = lfw.nn.RunningMeanDecoder.make(
+            encoder, normalizer, positions, velocities
+        )
+        model = lfw.nn.EncoderExternalDecoder(
             encoder=encoder, decoder=decoder, normalizer=normalizer
         )
 
         # Train
-        config = OrderingTrainingConfig(n_epochs=5, batch_size=16, show_pbar=False)
-        trained_model, opt_state, losses = train_simple_autoencoder(
+        config = lfw.nn.OrderingTrainingConfig(
+            n_epochs=5, batch_size=16, show_pbar=False
+        )
+        trained_model, opt_state, losses = lfw.nn.train_autoencoder(
             model, walk_result, config=config, key=jr.key(1)
         )
 
-        assert isinstance(trained_model, EncoderYouDecoder)
+        assert isinstance(trained_model, lfw.nn.EncoderExternalDecoder)
         assert losses.shape == (5,)
-
-    def test_train_with_custom_decoder_kwargs(self, model, sample_data):
-        """Test training with custom decoder kwargs."""
-        qs_norm, ps_norm = model.normalizer.transform(
-            sample_data["positions"], sample_data["velocities"]
-        )
-        ws_norm = jnp.concatenate([qs_norm, ps_norm], axis=1)
-
-        config = OrderingTrainingConfig(n_epochs=5, batch_size=16, show_pbar=False)
-
-        trained_model, _, _ = train_simple_autoencoder(
-            model,
-            ws_norm,
-            sample_data["ordering"],
-            config=config,
-            decoder_kwargs={"window_size": 0.3},
-            key=jr.key(1),
-        )
-
-        assert isinstance(trained_model, EncoderYouDecoder)
 
     def test_training_reduces_loss(self, model, sample_data):
         """Test that training reduces loss over epochs."""
         qs_norm, ps_norm = model.normalizer.transform(
             sample_data["positions"], sample_data["velocities"]
         )
-        ws_norm = jnp.concatenate([qs_norm, ps_norm], axis=1)
+        ws_norm = jnp.concat([qs_norm, ps_norm], axis=1)
 
-        config = OrderingTrainingConfig(n_epochs=20, batch_size=16, show_pbar=False)
+        config = lfw.nn.OrderingTrainingConfig(
+            n_epochs=20, batch_size=16, show_pbar=False
+        )
 
-        _, _, losses = train_simple_autoencoder(
+        _, _, losses = lfw.nn.train_autoencoder(
             model, ws_norm, sample_data["ordering"], config=config, key=jr.key(1)
         )
 
@@ -372,11 +352,13 @@ class TestTrainEncoderYouDecoder:
         qs_norm, ps_norm = model.normalizer.transform(
             sample_data["positions"], sample_data["velocities"]
         )
-        ws_norm = jnp.concatenate([qs_norm, ps_norm], axis=1)
+        ws_norm = jnp.concat([qs_norm, ps_norm], axis=1)
 
-        config = OrderingTrainingConfig(n_epochs=10, batch_size=16, show_pbar=False)
+        config = lfw.nn.OrderingTrainingConfig(
+            n_epochs=10, batch_size=16, show_pbar=False
+        )
 
-        trained_model, _, _ = train_simple_autoencoder(
+        trained_model, _, _ = lfw.nn.train_autoencoder(
             model, ws_norm, sample_data["ordering"], config=config, key=jr.key(1)
         )
 
@@ -411,24 +393,26 @@ class TestIntegration:
         walk_result = lfw.walk_local_flow(positions, velocities, start_idx=0, lam=0.5)
 
         # Create normalizer
-        normalizer = StandardScalerNormalizer(positions, velocities)
+        normalizer = lfw.nn.StandardScalerNormalizer(positions, velocities)
 
         # Create encoder
-        encoder = OrderingNet(in_size=4, width_size=64, depth=2, key=jr.key(0))
+        encoder = lfw.nn.OrderingNet(in_size=4, width_size=64, depth=2, key=jr.key(0))
 
         # Create initial decoder
-        decoder = RunningMeanDecoder.make(
+        decoder = lfw.nn.RunningMeanDecoder.make(
             encoder, normalizer, positions, velocities, window_size=0.15
         )
 
         # Create model
-        model = EncoderYouDecoder(
+        model = lfw.nn.EncoderExternalDecoder(
             encoder=encoder, decoder=decoder, normalizer=normalizer
         )
 
         # Train
-        config = OrderingTrainingConfig(n_epochs=10, batch_size=20, show_pbar=False)
-        trained_model, _, losses = train_simple_autoencoder(
+        config = lfw.nn.OrderingTrainingConfig(
+            n_epochs=10, batch_size=20, show_pbar=False
+        )
+        trained_model, _, losses = lfw.nn.train_autoencoder(
             model, walk_result, config=config, key=jr.key(1)
         )
 
@@ -445,13 +429,16 @@ class TestIntegration:
         # Check outputs
         assert gamma.shape == (N,)
         assert prob.shape == (N,)
-        assert reconstructed.shape == (N, 2)
+        assert isinstance(reconstructed, dict)
+        assert reconstructed["x"].shape == (N,)
+        assert reconstructed["y"].shape == (N,)
         assert jnp.all(jnp.isfinite(gamma))
         assert jnp.all(jnp.isfinite(prob))
-        assert jnp.all(jnp.isfinite(reconstructed))
+        assert jnp.all(jnp.isfinite(reconstructed["x"]))
+        assert jnp.all(jnp.isfinite(reconstructed["y"]))
 
     def test_comparison_with_path_autoencoder(self):
-        """Test that EncoderYouDecoder produces similar results to PathAutoencoder."""
+        """Test that EncoderExternalDecoder have similar results to PathAutoencoder."""
         # Create sample data
         N = 50
         positions = {"x": jnp.linspace(0, 5, N), "y": jnp.zeros(N)}
@@ -459,18 +446,22 @@ class TestIntegration:
 
         walk_result = lfw.walk_local_flow(positions, velocities, start_idx=0, lam=0.3)
 
-        normalizer = StandardScalerNormalizer(positions, velocities)
+        normalizer = lfw.nn.StandardScalerNormalizer(positions, velocities)
 
-        # Create EncoderYouDecoder
-        encoder = OrderingNet(in_size=4, width_size=32, depth=2, key=jr.key(0))
-        decoder = RunningMeanDecoder.make(encoder, normalizer, positions, velocities)
-        simple_model = EncoderYouDecoder(
+        # Create EncoderExternalDecoder
+        encoder = lfw.nn.OrderingNet(in_size=4, width_size=32, depth=2, key=jr.key(0))
+        decoder = lfw.nn.RunningMeanDecoder.make(
+            encoder, normalizer, positions, velocities
+        )
+        simple_model = lfw.nn.EncoderExternalDecoder(
             encoder=encoder, decoder=decoder, normalizer=normalizer
         )
 
         # Train
-        config = OrderingTrainingConfig(n_epochs=10, batch_size=16, show_pbar=False)
-        trained_simple, _, _ = train_simple_autoencoder(
+        config = lfw.nn.OrderingTrainingConfig(
+            n_epochs=10, batch_size=16, show_pbar=False
+        )
+        trained_simple, _, _ = lfw.nn.train_autoencoder(
             simple_model, walk_result, config=config, key=jr.key(1)
         )
 

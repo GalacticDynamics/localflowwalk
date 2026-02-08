@@ -114,11 +114,11 @@ class StandardScalerNormalizer(AbstractNormalizer):
         """Inverse the standardization to return to original data space."""
         # Positions
         qs = (qs * self.q_std) + self.q_mean
-        out_qs = {k: qs[:, i] for i, k in enumerate(self.q_comps)}
+        out_qs = {k: qs[..., i] for i, k in enumerate(self.q_comps)}
 
         # Velocities
         ps = (ps * self.p_std) + self.p_mean
-        out_ps = {k: ps[:, i] for i, k in enumerate(self.p_comps)}
+        out_ps = {k: ps[..., i] for i, k in enumerate(self.p_comps)}
 
         return out_qs, out_ps
 

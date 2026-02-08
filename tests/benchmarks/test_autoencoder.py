@@ -15,7 +15,7 @@ class TestAutoencoderTrainingBenchmarks:
 
         Trains both ordering net (encoder) and track net (decoder).
         """
-        config = lfw.nn.TrainingConfig(n_epochs_phase1=10, n_epochs_phase2=10)
+        config = lfw.nn.TrainingConfig(n_epochs_encoder=10, n_epochs_both=10)
         trained, _, losses = benchmark(
             lfw.nn.train_autoencoder,
             simple_autoencoder,
@@ -31,7 +31,7 @@ class TestAutoencoderTrainingBenchmarks:
         self, benchmark, medium_autoencoder, medium_wlf_result, rng_key
     ):
         """Benchmark full autoencoder training on 100-point stream."""
-        config = lfw.nn.TrainingConfig(n_epochs_phase1=20, n_epochs_phase2=20)
+        config = lfw.nn.TrainingConfig(n_epochs_encoder=20, n_epochs_both=20)
         trained, _, losses = benchmark(
             lfw.nn.train_autoencoder,
             medium_autoencoder,
@@ -47,7 +47,7 @@ class TestAutoencoderTrainingBenchmarks:
         self, benchmark, simple_autoencoder, simple_wlf_result, rng_key
     ):
         """Benchmark full autoencoder training with many epochs."""
-        config = lfw.nn.TrainingConfig(n_epochs_phase1=50, n_epochs_phase2=50)
+        config = lfw.nn.TrainingConfig(n_epochs_encoder=50, n_epochs_both=50)
         trained, _, losses = benchmark(
             lfw.nn.train_autoencoder,
             simple_autoencoder,
@@ -109,7 +109,7 @@ class TestAutoencoderTrainingBenchmarks:
 
         The decoder is trained as part of the full training pipeline.
         """
-        config = lfw.nn.TrainingConfig(n_epochs_phase1=5, n_epochs_phase2=5)
+        config = lfw.nn.TrainingConfig(n_epochs_encoder=5, n_epochs_both=5)
 
         # Train full autoencoder to get decoder training
         trained, _, _ = benchmark(
