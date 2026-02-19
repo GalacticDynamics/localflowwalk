@@ -160,6 +160,8 @@ myst_substitutions = {
 html_theme = "sphinx_book_theme"
 html_title = "localflowwalk"
 html_copy_source = True
+html_favicon = "_static/favicon.png"
+html_logo = "_static/favicon.png"
 
 html_static_path = ["_static"]
 html_css_files = []
