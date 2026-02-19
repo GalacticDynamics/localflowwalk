@@ -165,7 +165,8 @@ ignore = [
 ]
 "__init__.py" = ["F403"]
 "conftest.py" = ["ANN", "PLC0415"]
-"docs/conf.py" = ["A001", "INP001"]
+"docs/**" = ["N803", "T201"]
+"docs/conf.py" = ["A001", "INP001", "T201"]
 "noxfile.py" = ["A001", "T20"]
 "src/localflowwalk/_src/algorithm.py" = [
   "FBT003", # Boolean literal in function call is clearer than named constant
