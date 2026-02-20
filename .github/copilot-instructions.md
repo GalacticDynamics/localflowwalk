@@ -1,6 +1,6 @@
 # Project Overview
 
-`localflowwalk` is a JAX-native library for ordering phase-space observations
+`phasecurvefit` is a JAX-native library for ordering phase-space observations
 using a variety of tools.
 
 - **Language**: Python 3.12+
@@ -18,7 +18,7 @@ using a variety of tools.
 - Phase-space data: Two dicts with matching keys, e.g.,
   `{"x": array, "y": array}` for positions and velocities.
 
-### Distance Metrics (`localflowwalk.metrics`)
+### Distance Metrics (`phasecurvefit.metrics`)
 
 Pluggable metrics determine how the algorithm selects the next point:
 
@@ -34,7 +34,7 @@ Strategies control how neighbors are found:
 - `BruteForce()`: Default, computes distances to all points
 - `KDTree(k=...)`: KD-tree prefiltering (requires `jaxkd`)
 
-### Autoencoder for Gap Filling (`localflowwalk.nn`)
+### Autoencoder for Gap Filling (`phasecurvefit.nn`)
 
 Neural network for interpolating skipped tracers (Appendix A.2 of the paper):
 
@@ -57,17 +57,17 @@ result = pcf.walk_local_flow(pos, vel, start_idx=0, lam=u.Q(1.0, "kpc"))
 
 ## Folder Structure
 
-- `/src/localflowwalk/`: Public API
+- `/src/phasecurvefit/`: Public API
   - `__init__.py`: Main exports (`walk_local_flow`, strategies, result types)
   - `metrics.py`: Distance metric classes
   - `nn.py`: Autoencoder neural network module
   - `w.py`: Phase-space accessor utilities
-- `/src/localflowwalk/_src/`: Private implementation
+- `/src/phasecurvefit/_src/`: Private implementation
   - `algorithm.py`: Core `walk_local_flow` implementation
   - `autoencoder.py`: Neural network implementation (Equinox)
   - `metrics.py`: Metric base classes and implementations
   - `strategies.py`: Query strategy classes
-- `/src/localflowwalk/_interop/`: Optional dependency integrations
+- `/src/phasecurvefit/_interop/`: Optional dependency integrations
   - `interop_unxt.py`: `unxt` Quantity support via Quax dispatch
 - `/docs/guides/`: User guides (quickstart, metrics, JAX integration, etc.)
 - `/tests/`: Test suite organized by component

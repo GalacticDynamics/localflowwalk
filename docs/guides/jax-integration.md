@@ -1,6 +1,6 @@
 # JAX Integration
 
-This guide shows how to use `localflowwalk` with JAX for faster computation, batching, and differentiation.
+This guide shows how to use `phasecurvefit` with JAX for faster computation, batching, and differentiation.
 
 ## Basic Usage
 

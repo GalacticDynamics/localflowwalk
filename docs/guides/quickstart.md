@@ -1,22 +1,22 @@
 # Quickstart Guide
 
-Get started with localflowwalk in 5 minutes!
+Get started with phasecurvefit in 5 minutes!
 
 ## Installation
 
-Install localflowwalk using pip or uv:
+Install phasecurvefit using pip or uv:
 
 ::::{tab-set}
 
 :::{tab-item} pip
 ```bash
-pip install localflowwalk
+pip install phasecurvefit
 ```
 :::
 
 :::{tab-item} uv
 ```bash
-uv add localflowwalk
+uv add phasecurvefit
 ```
 :::
 

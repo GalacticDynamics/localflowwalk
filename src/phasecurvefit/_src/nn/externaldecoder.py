@@ -17,7 +17,7 @@ from .order_net import OrderingNet
 from phasecurvefit._src.custom_types import FSz0, FSzN, RSz0
 
 if TYPE_CHECKING:
-    import localflowwalk
+    import phasecurvefit  # noqa: ICN001
 
 Gamma: TypeAlias = FSzN  # noqa: UP040
 
@@ -44,7 +44,7 @@ class AbstractExternalDecoder(eqx.Module):
     @abc.abstractmethod
     def update(
         self,
-        model: "localflowwalk.nn.EncoderExternalDecoder",
+        model: "phasecurvefit.nn.EncoderExternalDecoder",
         all_ws: Float[Array, " N TwoF"],
     ) -> "AbstractExternalDecoder":
         """Update decoder parameters.
@@ -278,7 +278,7 @@ class RunningMeanDecoder(AbstractExternalDecoder):
 
     def update(
         self,
-        model: "localflowwalk.nn.EncoderExternalDecoder",
+        model: "phasecurvefit.nn.EncoderExternalDecoder",
         all_ws: Float[Array, " N TwoF"],
     ) -> "RunningMeanDecoder":
         """Update decoder parameters.

@@ -169,7 +169,7 @@ For the mathematical background on momentum-weighted ordering, refer to the [NN+
 **`strategy`**: Neighbor query strategy instance. Options:
     - `BruteForce()` (default): compute distances to all points
     - `KDTree(k=...)`: spatial KD-tree prefiltering, then metric selection
-        - Install optional dependency: `uv add localflowwalk[kdtree]`
+        - Install optional dependency: `uv add phasecurvefit[kdtree]`
         - Uses [jaxkd](https://github.com/dodgebc/jaxkd)
 
 Example using KD-tree:
@@ -222,7 +222,7 @@ The core algorithm originates from Nibauer et al. (2022). If you use **momentum-
 }
 ```
 
-If you use **localflowwalk** with custom metrics or for general phase-space ordering, please cite this package directly (check the [GitHub repository](https://github.com/GalacticDynamics/localflowwalk) for the latest citation format).
+If you use **phasecurvefit** with custom metrics or for general phase-space ordering, please cite this package directly (check the [GitHub repository](https://github.com/GalacticDynamics/phasecurvefit) for the latest citation format).
 
 ## Next Steps
 

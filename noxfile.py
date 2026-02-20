@@ -53,7 +53,7 @@ def precommit(s: nox.Session, /) -> None:
 @session(uv_groups=["lint"], reuse_venv=True)
 def pylint(s: nox.Session, /) -> None:
     """Run PyLint."""
-    s.run("pylint", "src/localflowwalk", *s.posargs)
+    s.run("pylint", "src/phasecurvefit", *s.posargs)
 
 
 # =============================================================================

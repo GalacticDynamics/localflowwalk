@@ -9,7 +9,7 @@ from optional_dependencies import OptionalDependencyEnum, auto
 
 
 class OptDeps(OptionalDependencyEnum):  # pylint: disable=invalid-enum-extension
-    """Optional dependency flags for localflowwalk interop."""
+    """Optional dependency flags for phasecurvefit interop."""
 
     UNXT = auto()
 

@@ -163,7 +163,7 @@ class KDTree(AbstractQueryStrategy):
         except ImportError:
             msg = (
                 "KDTree requires jaxkd optional dependency. "
-                "Install with: uv add localflowwalk[kdtree]"
+                "Install with: uv add phasecurvefit[kdtree]"
             )
             raise ImportError(msg) from None
         self._jaxkd = jaxkd
