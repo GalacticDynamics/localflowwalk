@@ -133,4 +133,10 @@ class TestAutoencoderTrainingBenchmarks:
 
         # Verify training completed successfully
         assert result is not None
-        assert len(losses) == 110  # encoder (5) + decoder (100 default) + both (5)
+        # Ensure the trained result contains a model with a decoder
+        assert getattr(result, "model", None) is not None
+        model = result.model
+        if isinstance(model, pcf.nn.PathAutoencoder):
+            assert getattr(model, "decoder", None) is not None
+        # encoder (5) + decoder (100 default) + both (5) = 110 total loss values
+        assert len(losses) == 110
