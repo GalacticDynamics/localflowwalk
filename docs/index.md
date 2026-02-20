@@ -147,7 +147,7 @@ Localflowwalk constructs a **single ordered walk** through your phase-space data
 
 The library ships with multiple built-in metrics (e.g., momentum-weighted, spatial-only), and you can implement custom metrics for domain-specific use cases. See the [Metrics Guide](guides/metrics) for full details and examples.
 
-For the mathematical background on momentum-weighted ordering, refer to the [NN+p paper](https://arxiv.org/abs/2201.12042).
+For the mathematical background on momentum-weighted ordering, refer to the [NN+p paper](https://arxiv.org/abs/2205.11767).
 
 ## Configuration Options
 
@@ -214,11 +214,23 @@ This dict-based API is designed for:
 The core algorithm originates from Nibauer et al. (2022). If you use **momentum-weighted ordering** or reference the original work in your research, please cite:
 
 ```bibtex
-@article{nibauer2022charting,
-  title={Charting Galactic Accelerations with Stellar Streams and Machine Learning},
-  author={Nibauer, Jacob and others},
-  journal={arXiv preprint arXiv:2201.12042},
-  year={2022}
+@ARTICLE{Nibauer_Charting_Accelerations,
+       author = {{Nibauer}, Jacob and {Belokurov}, Vasily and {Cranmer}, Miles and {Goodman}, Jeremy and {Ho}, Shirley},
+        title = "{Charting Galactic Accelerations with Stellar Streams and Machine Learning}",
+      journal = {\apj},
+     keywords = {Galaxy dynamics, Stellar streams, Galaxy mass distribution, Galaxy stellar halos, Milky Way dark matter halo, Galaxy structure, 591, 2166, 606, 598, 1049, 622, Astrophysics - Astrophysics of Galaxies, Astrophysics - Instrumentation and Methods for Astrophysics},
+         year = 2022,
+        month = nov,
+       volume = {940},
+       number = {1},
+          eid = {22},
+        pages = {22},
+          doi = {10.3847/1538-4357/ac93ee},
+archivePrefix = {arXiv},
+       eprint = {2205.11767},
+ primaryClass = {astro-ph.GA},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2022ApJ...940...22N},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 ```
 
