@@ -1,4 +1,4 @@
-"""Phase-space operations for localflowwalk.
+"""Phase-space operations for phasecurvefit.
 
 This module provides functions for computing distances, directions, and
 similarities in phase-space. All functions operate on **scalar components**

@@ -1,4 +1,4 @@
-"""localflowwalk.
+"""phasecurvefit.
 
 This library implements algorithms for ordering phase-space observations in
 stellar streams. The algorithm uses both spatial proximity and velocity momentum
@@ -27,9 +27,9 @@ order_w : function
 
 Submodules
 ----------
-localflowwalk.phasespace : module
+phasecurvefit.phasespace : module
     Low-level phase-space operations (distances, directions, similarities).
-localflowwalk.nn : module
+phasecurvefit.nn : module
     Neural network for interpolating skipped tracers.
 
 Examples

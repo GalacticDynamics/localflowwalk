@@ -1,4 +1,4 @@
-# Contributing to localflowwalk
+# Contributing to phasecurvefit
 
 Thank you for your interest in contributing! This guide covers the essentials.
 
@@ -118,4 +118,4 @@ We aim to provide feedback within 1 week.
 
 By contributing, you agree your work will be licensed under the project's MIT license.
 
-Thank you for contributing to localflowwalk!
+Thank you for contributing to phasecurvefit!

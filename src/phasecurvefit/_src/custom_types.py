@@ -1,4 +1,4 @@
-"""Type aliases for localflowwalk.
+"""Type aliases for phasecurvefit.
 
 This module defines common type aliases used throughout the library.
 """

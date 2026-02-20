@@ -46,7 +46,7 @@ following:
 Before being merged, a pull request for a new feature will be reviewed to see if
 it meets the following requirements. If you are unsure about how to meet all of
 these requirements, please submit the PR and ask for help and/or guidance. A
-`localflowwalk` maintainer will collaborate with you to make sure that the pull
+`phasecurvefit` maintainer will collaborate with you to make sure that the pull
 request meets the requirements for inclusion in the package:
 
 **Relevance:**

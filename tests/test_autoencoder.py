@@ -360,7 +360,7 @@ class TestFillOrderingGaps:
     """Tests for the fill_ordering_gaps function."""
 
     @pytest.fixture
-    def localflowwalk_with_gaps(self):
+    def phasecurvefit_with_gaps(self):
         """Create a simple phase-flow walk result with skipped tracers."""
         n_points = 30
         key = jax.random.key(42)
@@ -384,14 +384,14 @@ class TestFillOrderingGaps:
             pos, vel, start_idx=start_idx, metric_scale=3.0, max_dist=0.8
         )
 
-    def test_fills_gaps(self, localflowwalk_with_gaps, rng_key: PRNGKeyArray):
+    def test_fills_gaps(self, phasecurvefit_with_gaps, rng_key: PRNGKeyArray):
         """Test that fill_ordering_gaps produces complete ordering."""
         # Skip if there are no gaps
-        if len(localflowwalk_with_gaps.skipped_indices) == 0:
+        if len(phasecurvefit_with_gaps.skipped_indices) == 0:
             pytest.skip("No skipped indices in this test case")
 
         normalizer = pcf.nn.StandardScalerNormalizer(
-            localflowwalk_with_gaps.positions, localflowwalk_with_gaps.velocities
+            phasecurvefit_with_gaps.positions, phasecurvefit_with_gaps.velocities
         )
         key1, key2 = jax.random.split(rng_key)
         ae = pcf.nn.PathAutoencoder.make(normalizer, gamma_range=(0.0, 1.0), key=key1)
@@ -400,7 +400,7 @@ class TestFillOrderingGaps:
             n_epochs_encoder=25, n_epochs_decoder=25, n_epochs_both=25, show_pbar=False
         )
         result, _, _ = pcf.nn.train_autoencoder(
-            ae, localflowwalk_with_gaps, config=config, key=key2
+            ae, phasecurvefit_with_gaps, config=config, key=key2
         )
 
         assert hasattr(result, "gamma")
@@ -408,12 +408,12 @@ class TestFillOrderingGaps:
         assert hasattr(result, "indices")
 
         # Should have more points than original phase-flow walk result
-        assert len(result.indices) >= len(localflowwalk_with_gaps.indices)
+        assert len(result.indices) >= len(phasecurvefit_with_gaps.indices)
 
-    def test_result_structure(self, localflowwalk_with_gaps, rng_key: PRNGKeyArray):
+    def test_result_structure(self, phasecurvefit_with_gaps, rng_key: PRNGKeyArray):
         """Test that result has correct structure."""
         normalizer = pcf.nn.StandardScalerNormalizer(
-            localflowwalk_with_gaps.positions, localflowwalk_with_gaps.velocities
+            phasecurvefit_with_gaps.positions, phasecurvefit_with_gaps.velocities
         )
         key1, key2 = jax.random.split(rng_key)
         ae = pcf.nn.PathAutoencoder.make(normalizer, gamma_range=(0.0, 1.0), key=key1)
@@ -422,7 +422,7 @@ class TestFillOrderingGaps:
             n_epochs_encoder=5, n_epochs_decoder=5, n_epochs_both=5, show_pbar=False
         )
         result, _, _ = pcf.nn.train_autoencoder(
-            ae, localflowwalk_with_gaps, config=config, key=key2
+            ae, phasecurvefit_with_gaps, config=config, key=key2
         )
 
         # Result is a NamedTuple, not a dict
@@ -432,10 +432,10 @@ class TestFillOrderingGaps:
         assert hasattr(result, "velocities")
         assert hasattr(result, "indices")
 
-    def test_prob_threshold(self, localflowwalk_with_gaps, rng_key: PRNGKeyArray):
+    def test_prob_threshold(self, phasecurvefit_with_gaps, rng_key: PRNGKeyArray):
         """Test probability threshold filtering."""
         normalizer = pcf.nn.StandardScalerNormalizer(
-            localflowwalk_with_gaps.positions, localflowwalk_with_gaps.velocities
+            phasecurvefit_with_gaps.positions, phasecurvefit_with_gaps.velocities
         )
         key1, key2 = jax.random.split(rng_key)
         ae = pcf.nn.PathAutoencoder.make(normalizer, gamma_range=(0.0, 1.0), key=key1)
@@ -444,14 +444,14 @@ class TestFillOrderingGaps:
             n_epochs_encoder=5, n_epochs_decoder=5, n_epochs_both=5, show_pbar=False
         )
         trained, _, _ = pcf.nn.train_autoencoder(
-            ae, localflowwalk_with_gaps, config=config, key=key2
+            ae, phasecurvefit_with_gaps, config=config, key=key2
         )
 
         result_low = pcf.nn.fill_ordering_gaps(
-            trained.model, localflowwalk_with_gaps, prob_threshold=0.1
+            trained.model, phasecurvefit_with_gaps, prob_threshold=0.1
         )
         result_high = pcf.nn.fill_ordering_gaps(
-            trained.model, localflowwalk_with_gaps, prob_threshold=0.9
+            trained.model, phasecurvefit_with_gaps, prob_threshold=0.9
         )
 
         # Higher threshold should give fewer or equal points

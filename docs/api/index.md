@@ -1,9 +1,9 @@
 # API Reference
 
-Complete API documentation for localflowwalk.
+Complete API documentation for phasecurvefit.
 
 ```{eval-rst}
-.. currentmodule:: localflowwalk
+.. currentmodule:: phasecurvefit
 ```
 
 ## Main Function
@@ -28,7 +28,7 @@ Pluggable distance metrics for controlling how the algorithm selects the next po
 See the [Metrics Guide](../guides/metrics.md) for usage examples.
 
 ```{eval-rst}
-.. currentmodule:: localflowwalk.metrics
+.. currentmodule:: phasecurvefit.metrics
 
 .. autoclass:: AbstractDistanceMetric
    :no-index:
@@ -50,15 +50,15 @@ See the [Metrics Guide](../guides/metrics.md) for usage examples.
    :members:
    :show-inheritance:
 
-.. currentmodule:: localflowwalk
+.. currentmodule:: phasecurvefit
 ```
 
 ## Phase-Space Utilities
 
-Low-level functions for phase-space operations. Available in the `localflowwalk.w` submodule.
+Low-level functions for phase-space operations. Available in the `phasecurvefit.w` submodule.
 
 ```{eval-rst}
-.. currentmodule:: localflowwalk.w
+.. currentmodule:: phasecurvefit.w
 
 .. autofunction:: euclidean_distance
    :no-index:
@@ -75,7 +75,7 @@ Low-level functions for phase-space operations. Available in the `localflowwalk.
 .. autofunction:: get_w_at
    :no-index:
 
-.. currentmodule:: localflowwalk
+.. currentmodule:: phasecurvefit
 ```
 
 ## Types
@@ -124,22 +124,22 @@ Neural network for interpolating skipped tracers. See [Autoencoder Guide](../gui
 ### Classes
 
 ```{eval-rst}
-.. autoclass:: localflowwalk.nn.PathAutoencoder
+.. autoclass:: phasecurvefit.nn.PathAutoencoder
    :no-index:
    :members: encode, decode, decode_position, predict
    :show-inheritance:
 
-.. autoclass:: localflowwalk.nn.OrderingNet
+.. autoclass:: phasecurvefit.nn.OrderingNet
    :no-index:
    :members: __call__
    :show-inheritance:
 
-.. autoclass:: localflowwalk.nn.TrackNet
+.. autoclass:: phasecurvefit.nn.TrackNet
    :no-index:
    :members: __call__
    :show-inheritance:
 
-.. autoclass:: localflowwalk.nn.TrainingConfig
+.. autoclass:: phasecurvefit.nn.TrainingConfig
    :no-index:
    :members:
 ```
@@ -147,10 +147,10 @@ Neural network for interpolating skipped tracers. See [Autoencoder Guide](../gui
 ### Training Functions
 
 ```{eval-rst}
-.. autofunction:: localflowwalk.nn.train_autoencoder
+.. autofunction:: phasecurvefit.nn.train_autoencoder
    :no-index:
 
-.. autofunction:: localflowwalk.nn.fill_ordering_gaps
+.. autofunction:: phasecurvefit.nn.fill_ordering_gaps
    :no-index:
 ```
 
